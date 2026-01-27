@@ -9,29 +9,6 @@ title.innerText = `🎬 ${user}'s Watchlist`;
 
 let movies = [];
 
-// Simple CSV line parser that respects quotes
-function parseCSVLine(line) {
-  const result = [];
-  let current = "";
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-
-    if (char === '"') {
-      inQuotes = !inQuotes;
-    } else if (char === "," && !inQuotes) {
-      result.push(current);
-      current = "";
-    } else {
-      current += char;
-    }
-  }
-  result.push(current);
-  return result.map(v => v.replace(/^"|"$/g, "").trim());
-}
-
-// Fetch CSV
 fetch(`data/${user}.csv?v=${Date.now()}`)
   .then(res => {
     if (!res.ok) throw new Error("CSV not found");
@@ -40,14 +17,21 @@ fetch(`data/${user}.csv?v=${Date.now()}`)
   .then(text => {
     const lines = text.split(/\r?\n/).filter(Boolean);
 
-    // Parse headers safely
-    const headers = parseCSVLine(lines[0]);
-    const nameIndex = headers.indexOf("Name");
+    // Skip header
+    movies = lines.slice(1).map(line => {
+      const parts = line.split(",");
 
-    movies = lines
-      .slice(1)
-      .map(line => parseCSVLine(line)[nameIndex])
-      .filter(Boolean);
+      // Date = parts[0]
+      // Year = second last
+      // URL = last
+      // Name = EVERYTHING in between
+      if (parts.length < 4) return null;
+
+      const nameParts = parts.slice(1, parts.length - 2);
+      const name = nameParts.join(",").trim();
+
+      return name || null;
+    }).filter(Boolean);
 
     if (!movies.length) {
       movieDiv.innerText = "❌ No movies found";
