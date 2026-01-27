@@ -16,10 +16,15 @@ fetch(`data/${user}.csv?v=${Date.now()}`)
   })
   .then(text => {
     movies = text
-      .split(/\r?\n/)
-      .slice(1)          // skip header
-      .map(line => line.trim())
-      .filter(Boolean);
+  .split(/\r?\n/)
+  .slice(1)
+  .map(line =>
+    line
+      .replace(/^"|"$/g, "") // remove starting & ending quotes
+      .trim()
+  )
+  .filter(Boolean);
+
 
     if (!movies.length) {
       movieDiv.innerText = "❌ No movies found";
