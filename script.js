@@ -15,31 +15,18 @@ fetch(`data/${user}.csv?v=${Date.now()}`)
     return res.text();
   })
   .then(text => {
-    const lines = text.split(/\r?\n/).filter(Boolean);
-
-    // Skip header
-    movies = lines.slice(1).map(line => {
-      const parts = line.split(",");
-
-      // Date = parts[0]
-      // Year = second last
-      // URL = last
-      // Name = EVERYTHING in between
-      if (parts.length < 4) return null;
-
-      const nameParts = parts.slice(1, parts.length - 2);
-      const name = nameParts.join(",").trim();
-
-      return name || null;
-    }).filter(Boolean);
+    movies = text
+      .split(/\r?\n/)
+      .slice(1)          // skip header
+      .map(line => line.trim())
+      .filter(Boolean);
 
     if (!movies.length) {
       movieDiv.innerText = "❌ No movies found";
     }
   })
-  .catch(err => {
+  .catch(() => {
     movieDiv.innerText = "❌ Watchlist not found";
-    console.error(err);
   });
 
 button.onclick = () => {
@@ -47,7 +34,6 @@ button.onclick = () => {
     movieDiv.innerText = "Loading movies...";
     return;
   }
-
   const random = movies[Math.floor(Math.random() * movies.length)];
   movieDiv.innerText = random;
 };
