@@ -3,42 +3,89 @@ const user = params.get("user");
 
 const title = document.getElementById("title");
 const movieDiv = document.getElementById("movie");
-const button = document.getElementById("pickBtn");
+const pickBtn = document.getElementById("pickBtn");
+const watchedBtn = document.getElementById("watchedBtn");
 
 title.innerText = `🎬 ${user}'s Watchlist`;
 
-let movies = [];
+let allMovies = [];
+let remainingMovies = [];
+let currentMovie = null;
 
+// ---- localStorage keys (per user, per device) ----
+const STORAGE_KEY = `movie-picker-${user}`;
+const WATCHED_KEY = `movie-watched-${user}`;
+
+// ---- Load watched list ----
+let watched = JSON.parse(localStorage.getItem(WATCHED_KEY)) || [];
+
+// ---- Fetch CSV (Name-only CSV) ----
 fetch(`data/${user}.csv?v=${Date.now()}`)
   .then(res => {
     if (!res.ok) throw new Error("CSV not found");
     return res.text();
   })
   .then(text => {
-    movies = text
-  .split(/\r?\n/)
-  .slice(1)
-  .map(line =>
-    line
-      .replace(/^"|"$/g, "") // remove starting & ending quotes
-      .trim()
-  )
-  .filter(Boolean);
+    allMovies = text
+      .split(/\r?\n/)
+      .slice(1)
+      .map(line =>
+        line.replace(/^"|"$/g, "").trim()
+      )
+      .filter(Boolean);
 
+    // Remove watched movies
+    remainingMovies = allMovies.filter(m => !watched.includes(m));
 
-    if (!movies.length) {
-      movieDiv.innerText = "❌ No movies found";
+    if (!remainingMovies.length) {
+      movieDiv.innerText = "🎉 All movies watched!";
     }
   })
   .catch(() => {
     movieDiv.innerText = "❌ Watchlist not found";
   });
 
-button.onclick = () => {
-  if (!movies.length) {
-    movieDiv.innerText = "Loading movies...";
+// ---- Shuffle animation ----
+function shuffleAnimation(finalMovie) {
+  let i = 0;
+  const interval = setInterval(() => {
+    movieDiv.innerText =
+      allMovies[Math.floor(Math.random() * allMovies.length)];
+    i++;
+    if (i > 15) {
+      clearInterval(interval);
+      movieDiv.innerText = finalMovie;
+    }
+  }, 80);
+}
+
+// ---- Pick movie (no-repeat) ----
+pickBtn.onclick = () => {
+  if (!remainingMovies.length) {
+    movieDiv.innerText = "🎉 All movies watched!";
+    watchedBtn.style.display = "none";
     return;
   }
-  const random = movies[Math.floor(Math.random() * movies.length)];
-  movieDiv.innerText = random;
+
+  const index = Math.floor(Math.random() * remainingMovies.length);
+  currentMovie = remainingMovies[index];
+
+  shuffleAnimation(currentMovie);
+
+  watchedBtn.style.display = "block";
+};
+
+// ---- Mark as watched ----
+watchedBtn.onclick = () => {
+  if (!currentMovie) return;
+
+  watched.push(currentMovie);
+  localStorage.setItem(WATCHED_KEY, JSON.stringify(watched));
+
+  remainingMovies = remainingMovies.filter(m => m !== currentMovie);
+
+  movieDiv.innerText = "Enjoy your movie 🍿";
+  watchedBtn.style.display = "none";
+
+  currentMovie = null;
 };
