@@ -6,12 +6,14 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="container">
+    <div class="card">
+      <h1>🎬 Movie Picker</h1>
+      <div class="subtitle">Choose your watchlist</div>
 
-  <h1>🎬 Choose Your Watchlist</h1>
-
-  <div class="users">
-    <button onclick="go('rutvik')">Rutvik</button>
-    <button onclick="go('parth')">Parth</button>
+      <button onclick="go('rutvik')">Rutvik</button>
+      <button onclick="go('parth')">Parth</button>
+    </div>
   </div>
 
   <script>
@@ -19,6 +21,6 @@
       window.location.href = `picker.html?user=${name}`;
     }
   </script>
-
 </body>
+
 </html>
