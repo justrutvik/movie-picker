@@ -4,13 +4,15 @@ const user = params.get("user");
 const title = document.getElementById("title");
 const movieDiv = document.getElementById("movie");
 const pickBtn = document.getElementById("pickBtn");
-const watchedBtn = document.getElementById("watchedBtn");
+const watchingBtn = document.getElementById("watchingBtn");
+const undoBtn = document.getElementById("undoBtn");
 
 title.innerText = `🎬 ${user}'s Watchlist`;
 
 let allMovies = [];
 let remainingMovies = [];
 let currentMovie = null;
+let lastWatched = null;
 
 // ---- localStorage keys (per user, per device) ----
 const STORAGE_KEY = `movie-picker-${user}`;
@@ -65,6 +67,9 @@ pickBtn.onclick = () => {
     movieDiv.innerText = "🎉 All movies watched!";
     watchedBtn.style.display = "none";
     return;
+    watchingBtn.classList.remove("disabled");
+    undoBtn.classList.add("disabled");
+
   }
 
   const index = Math.floor(Math.random() * remainingMovies.length);
@@ -76,16 +81,42 @@ pickBtn.onclick = () => {
 };
 
 // ---- Mark as watched ----
-watchedBtn.onclick = () => {
+watchingBtn.onclick = () => {
   if (!currentMovie) return;
+
+  lastWatched = currentMovie;
 
   watched.push(currentMovie);
   localStorage.setItem(WATCHED_KEY, JSON.stringify(watched));
 
   remainingMovies = remainingMovies.filter(m => m !== currentMovie);
+  updateCounter();
 
   movieDiv.innerText = "Enjoy your movie 🍿";
-  watchedBtn.style.display = "none";
+
+  // Disable watching, enable undo
+  watchingBtn.classList.add("disabled");
+  undoBtn.classList.remove("disabled");
 
   currentMovie = null;
 };
+
+undoBtn.onclick = () => {
+  if (!lastWatched) return;
+
+  watched = watched.filter(m => m !== lastWatched);
+  localStorage.setItem(WATCHED_KEY, JSON.stringify(watched));
+
+  remainingMovies.push(lastWatched);
+  updateCounter();
+
+  movieDiv.innerText = `Restored: ${lastWatched}`;
+
+  // Reset buttons
+  watchingBtn.classList.remove("disabled");
+  undoBtn.classList.add("disabled");
+
+  currentMovie = lastWatched;
+  lastWatched = null;
+};
+
