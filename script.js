@@ -6,6 +6,7 @@ const movieDiv = document.getElementById("movie");
 const pickBtn = document.getElementById("pickBtn");
 const watchingBtn = document.getElementById("watchingBtn");
 const undoBtn = document.getElementById("undoBtn");
+const movieCount = document.getElementById("movieCount");
 
 title.innerText = `🎬 ${user}'s Watchlist`;
 
@@ -38,7 +39,8 @@ fetch(`data/${user}.csv?v=${Date.now()}`)
 
     // Remove watched movies
     remainingMovies = allMovies.filter(m => !watched.includes(m));
-
+    updateMovieCount();
+    
     if (!remainingMovies.length) {
       movieDiv.innerText = "🎉 All movies watched!";
     }
@@ -46,6 +48,16 @@ fetch(`data/${user}.csv?v=${Date.now()}`)
   .catch(() => {
     movieDiv.innerText = "❌ Watchlist not found";
   });
+
+
+function updateMovieCount() {
+  if (!remainingMovies.length) {
+    movieCount.innerText = "No movies left 🎉";
+  } else {
+    movieCount.innerText =
+      `${remainingMovies.length} movie${remainingMovies.length !== 1 ? "s" : ""} in this watchlist`;
+  }
+}
 
 // ---- Shuffle animation ----
 function shuffleAnimation(finalMovie) {
@@ -90,6 +102,7 @@ watchingBtn.onclick = () => {
   localStorage.setItem(WATCHED_KEY, JSON.stringify(watched));
 
   remainingMovies = remainingMovies.filter(m => m !== currentMovie);
+  updateMovieCount();
   updateCounter();
 
   movieDiv.innerText = "Enjoy your movie 🍿";
@@ -108,6 +121,7 @@ undoBtn.onclick = () => {
   localStorage.setItem(WATCHED_KEY, JSON.stringify(watched));
 
   remainingMovies.push(lastWatched);
+  updateMovieCount();
   updateCounter();
 
   movieDiv.innerText = `Restored: ${lastWatched}`;
