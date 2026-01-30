@@ -76,3 +76,8 @@ button.secondary {
   font-weight: 600;
   min-height: 2.2em;
 }
+
+button.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
