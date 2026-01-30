@@ -81,3 +81,10 @@ button.disabled {
   opacity: 0.4;
   pointer-events: none;
 }
+
+.movie-count {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+
