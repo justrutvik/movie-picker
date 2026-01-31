@@ -103,7 +103,7 @@ watchingBtn.onclick = () => {
 
   remainingMovies = remainingMovies.filter(m => m !== currentMovie);
   updateMovieCount();
-  updateCounter();
+  
 
   movieDiv.innerText = "Enjoy your movie 🍿";
 
