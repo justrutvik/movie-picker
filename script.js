@@ -122,7 +122,6 @@ undoBtn.onclick = () => {
 
   remainingMovies.push(lastWatched);
   updateMovieCount();
-  updateCounter();
 
   movieDiv.innerText = `Restored: ${lastWatched}`;
 
