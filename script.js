@@ -121,6 +121,9 @@ undoBtn.onclick = () => {
   localStorage.setItem(WATCHED_KEY, JSON.stringify(watched));
 
   remainingMovies.push(lastWatched);
+  
+  currentMovie = lastWatched;
+  lastWatched = null;
   updateMovieCount();
 
   movieDiv.innerText = `Restored: ${lastWatched}`;
@@ -129,7 +132,6 @@ undoBtn.onclick = () => {
   watchingBtn.classList.remove("disabled");
   undoBtn.classList.add("disabled");
 
-  currentMovie = lastWatched;
-  lastWatched = null;
+ 
 };
 
